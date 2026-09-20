@@ -53,7 +53,8 @@ const SliderCardMedia: React.FC<{
           filter:
             curveMode === 'cylinder' && isActive
               ? 'saturate(1.38) contrast(1.08) brightness(1.02)'
-              : undefined,
+              : 'saturate(1) contrast(1) brightness(1)',
+          transition: 'filter 0.85s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
         className={`w-full h-full object-cover select-none pointer-events-none transition-all duration-500 ${
           fisheyeOn && isActive ? 'fisheye-optical' : ''
@@ -176,6 +177,30 @@ export const SliderView: React.FC<SliderViewProps> = ({
   const snapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentIndexRef = useRef(currentIndex);
   currentIndexRef.current = currentIndex;
+
+  // Smooth curve mode switch transition state on desktop
+  const [isCurveTransitioning, setIsCurveTransitioning] = useState(false);
+  const [trackedMode, setTrackedMode] = useState(effectiveCurveMode);
+  const [trackedFisheye, setTrackedFisheye] = useState(effectiveFisheye);
+  const curveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Synchronously catch mode changes during render so transition styles are present on the very first frame!
+  if (trackedMode !== effectiveCurveMode || trackedFisheye !== effectiveFisheye) {
+    setTrackedMode(effectiveCurveMode);
+    setTrackedFisheye(effectiveFisheye);
+    if (!isMobile) {
+      setIsCurveTransitioning(true);
+    }
+  }
+
+  useEffect(() => {
+    if (isCurveTransitioning) {
+      if (curveTimerRef.current) clearTimeout(curveTimerRef.current);
+      curveTimerRef.current = setTimeout(() => {
+        setIsCurveTransitioning(false);
+      }, 1000);
+    }
+  }, [isCurveTransitioning]);
 
   // Continuous physics animation loop for liquid 60/120fps smooth momentum
   useEffect(() => {
@@ -305,6 +330,10 @@ export const SliderView: React.FC<SliderViewProps> = ({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isCurveTransitioning) {
+        setIsCurveTransitioning(false);
+        if (curveTimerRef.current) clearTimeout(curveTimerRef.current);
+      }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         goToNext();
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
@@ -320,7 +349,7 @@ export const SliderView: React.FC<SliderViewProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goToNext, goToPrev, displayProjects, displayTotal, onSelectProject]);
+  }, [goToNext, goToPrev, displayProjects, displayTotal, onSelectProject, isCurveTransitioning]);
 
   // Non-blocking wheel listener with continuous smooth fractional movement
   useEffect(() => {
@@ -329,6 +358,10 @@ export const SliderView: React.FC<SliderViewProps> = ({
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
+      if (isCurveTransitioning) {
+        setIsCurveTransitioning(false);
+        if (curveTimerRef.current) clearTimeout(curveTimerRef.current);
+      }
       const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       const curStep = effectiveFisheye ? 180 : step;
 
@@ -347,7 +380,7 @@ export const SliderView: React.FC<SliderViewProps> = ({
 
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [step, effectiveFisheye]);
+  }, [step, effectiveFisheye, isCurveTransitioning]);
 
   // Pointer drag handling: 1:1 direct tracking with momentum fling release
   const lastXRef = useRef(0);
@@ -359,6 +392,11 @@ export const SliderView: React.FC<SliderViewProps> = ({
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     if (e.pointerType === 'touch') setIsTouchDevice(true);
+
+    if (isCurveTransitioning) {
+      setIsCurveTransitioning(false);
+      if (curveTimerRef.current) clearTimeout(curveTimerRef.current);
+    }
 
     isDraggingRef.current = true;
     hasDraggedRef.current = false;
@@ -521,18 +559,14 @@ export const SliderView: React.FC<SliderViewProps> = ({
 
             const isActive = Math.abs(continuousOffset) < 0.48;
 
-            // Frames up to 6.5 steps away on desktop, 2.5 on mobile are rendered
+            // Frames up to 8.5 steps away during curve transition on desktop, 7.0 normally, 2.5 on mobile are rendered
             const isFarOffscreen = isMobile
               ? Math.abs(continuousOffset) > 2.5
-              : Math.abs(continuousOffset) > 6.5;
+              : Math.abs(continuousOffset) > (isCurveTransitioning ? 8.5 : 7.0);
             if (isFarOffscreen) return null;
 
             const width = effectiveFisheye && isActive
               ? frameDimensions.fisheyeSize
-              : isMobile
-              ? frameDimensions.width
-              : effectiveCurveMode === 'off'
-              ? frameDimensions.width + 1
               : frameDimensions.width;
             const height = effectiveFisheye && isActive ? frameDimensions.fisheyeSize : frameDimensions.height;
 
@@ -615,9 +649,7 @@ export const SliderView: React.FC<SliderViewProps> = ({
               ? isActive
                 ? 30
                 : Math.max(1, 20 - Math.round(Math.abs(continuousOffset)))
-              : effectiveCurveMode === 'cylinder'
-              ? Math.round(100 - Math.abs(continuousOffset) * 15)
-              : Math.max(1, 35 - Math.round(Math.abs(continuousOffset)));
+              : Math.max(1, 100 - Math.round(Math.abs(continuousOffset) * 6));
 
             return (
               <div
@@ -654,7 +686,9 @@ export const SliderView: React.FC<SliderViewProps> = ({
                 style={{
                   width: `${width}px`,
                   height: `${height}px`,
-                  transform: `translate3d(calc(-50% + ${targetX}px), calc(-50% + ${targetY}px), ${targetZ}px) rotateY(${rotY}deg) rotateZ(${rotZ}deg) scale(${scale})`,
+                  marginLeft: `-${width / 2}px`,
+                  marginTop: `-${height / 2}px`,
+                  transform: `translate3d(${targetX}px, ${targetY}px, ${targetZ}px) rotateY(${rotY}deg) rotateZ(${rotZ}deg) scale(${scale})`,
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden',
                   position: 'absolute',
@@ -663,21 +697,28 @@ export const SliderView: React.FC<SliderViewProps> = ({
                   zIndex,
                   opacity,
                   pointerEvents,
-                  transition: 'width 0.7s cubic-bezier(0.16, 1, 0.3, 1), height 0.7s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow:
+                    isMobile || effectiveCurveMode === 'off'
+                      ? '0 0 0 0 rgba(0,0,0,0)'
+                      : isActive
+                      ? '0 25px 60px -15px rgba(0,0,0,0.95)'
+                      : effectiveCurveMode === 'arch'
+                      ? '0 20px 45px -10px rgba(0,0,0,0.85)'
+                      : '0 15px 35px -10px rgba(0,0,0,0.85)',
+                  transition:
+                    isCurveTransitioning && !isDragging
+                      ? 'transform 0.95s cubic-bezier(0.16, 1, 0.3, 1), width 0.8s cubic-bezier(0.16, 1, 0.3, 1), height 0.8s cubic-bezier(0.16, 1, 0.3, 1), margin 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.95s cubic-bezier(0.16, 1, 0.3, 1)'
+                      : 'width 0.7s cubic-bezier(0.16, 1, 0.3, 1), height 0.7s cubic-bezier(0.16, 1, 0.3, 1), margin 0.7s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
                   willChange: 'transform',
                 }}
                 className={`select-none overflow-hidden cursor-pointer rounded-none ${
                   isMobile
-                    ? 'filter-none shadow-none'
+                    ? 'filter-none'
                     : isActive
-                    ? effectiveCurveMode === 'off'
-                      ? 'filter-none shadow-none'
-                      : 'filter-none shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)]'
-                    : effectiveCurveMode === 'off'
-                    ? 'filter grayscale contrast-90 brightness-90 shadow-none'
+                    ? 'filter-none'
                     : effectiveCurveMode === 'arch'
-                    ? 'filter grayscale contrast-90 brightness-90 hover:brightness-100 shadow-[0_20px_45px_-10px_rgba(0,0,0,0.85)]'
-                    : 'filter grayscale contrast-90 brightness-90 shadow-[0_15px_35px_-10px_rgba(0,0,0,0.85)]'
+                    ? 'filter grayscale contrast-90 brightness-90 hover:brightness-100'
+                    : 'filter grayscale contrast-90 brightness-90'
                 }`}
               >
                 {/* Media in Frame (plays on hover for video) */}
@@ -713,7 +754,7 @@ export const SliderView: React.FC<SliderViewProps> = ({
 
                 {/* 3D Mode Framing Border Overlay - smoothly fades out to zero in off mode so it never affects content sizing */}
                 <div
-                  className="absolute inset-0 pointer-events-none transition-opacity duration-700 ease-out"
+                  className="absolute inset-0 pointer-events-none transition-opacity duration-900 ease-out"
                   style={{
                     border: '1px solid',
                     borderColor:
@@ -728,7 +769,7 @@ export const SliderView: React.FC<SliderViewProps> = ({
 
                 {/* 3D Atmospheric Depth Shading Overlay across curve (used for arc/cylinder) */}
                 <div
-                  className="absolute inset-0 pointer-events-none transition-opacity duration-700 ease-out"
+                  className="absolute inset-0 pointer-events-none transition-opacity duration-900 ease-out"
                   style={{
                     background:
                       continuousOffset > 0.05
