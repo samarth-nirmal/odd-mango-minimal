@@ -1,0 +1,8 @@
+{
+  "name": "ODD MANGO — Photography & Film Portfolio",
+  "description": "Documenting emotion, movement and meaning. The photography and film portfolio of ODD MANGO.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
