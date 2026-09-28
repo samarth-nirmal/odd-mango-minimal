@@ -8,6 +8,7 @@ interface HeaderProps {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   onOpenAbout: () => void;
+  onOpenContact?: () => void;
   soundOn?: boolean;
   setSoundOn?: (on: boolean) => void;
 }
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   viewMode,
   setViewMode,
   onOpenAbout,
+  onOpenContact,
   soundOn = true,
   setSoundOn,
 }) => {
@@ -115,10 +117,12 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {/* CONTACT */}
-          <a
-            id="nav-contact-link"
-            href="mailto:hello@oddmango.com"
-            onClick={() => playTick()}
+          <button
+            id="nav-contact-btn"
+            onClick={() => {
+              playTick();
+              onOpenContact?.();
+            }}
             className="text-xs sm:text-sm uppercase text-[#cbc7c2]/80 hover:text-[#fcf8ef] transition-colors cursor-pointer font-medium"
           >
             <span className="roll">
@@ -127,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="roll-face text-white">contact</span>
               </span>
             </span>
-          </a>
+          </button>
         </div>
 
         {/* Right: Mobile Hamburger Button (Visible only on mobile screen) */}
@@ -192,17 +196,17 @@ export const Header: React.FC<HeaderProps> = ({
                   <ArrowUpRight className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" size={28} />
                 </button>
 
-                <a
-                  href="mailto:hello@oddmango.com"
+                <button
                   onClick={() => {
                     playTick();
                     setIsMobileMenuOpen(false);
+                    onOpenContact?.();
                   }}
                   className="flex items-center justify-between text-left text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#fcf8ef] hover:text-[#2554f2] transition-colors cursor-pointer group"
                 >
                   <span>Contact</span>
                   <ArrowUpRight className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" size={28} />
-                </a>
+                </button>
               </div>
 
               {/* Status & Options Card */}

@@ -34,6 +34,25 @@ export const STUDIO_INFO: StudioInfo = {
   ]
 };
 
+export interface TeamMember {
+  name: string;
+  role: string;
+  email: string;
+}
+
+export const TEAM_MEMBERS: TeamMember[] = [
+  {
+    name: 'Marco Santos',
+    role: 'Founder & Creative Director',
+    email: 'marco@oddmango.com'
+  },
+  {
+    name: 'Sarah Chen',
+    role: 'Executive Producer',
+    email: 'sarah@oddmango.com'
+  }
+];
+
 const assetUrl = (path: string): string => {
   const base = import.meta.env.BASE_URL || './';
   const cleanBase = base.endsWith('/') ? base : `${base}/`;

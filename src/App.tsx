@@ -9,6 +9,7 @@ import { ProjectLightbox } from './components/ProjectLightbox';
 import { StillGalleryModal } from './components/StillGalleryModal';
 import { FullscreenVideoModal } from './components/FullscreenVideoModal';
 import { StudioModal } from './components/StudioModal';
+import { ContactModal } from './components/ContactModal';
 import { SoundIntro } from './components/SoundIntro';
 import { Footer } from './components/Footer';
 import { loadSoundAssets, setSoundEnabled } from './services/audio';
@@ -25,6 +26,7 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   // Preload sound on startup
   useEffect(() => {
@@ -77,6 +79,7 @@ export default function App() {
         viewMode={viewMode}
         setViewMode={setViewMode}
         onOpenAbout={() => setIsAboutOpen(true)}
+        onOpenContact={() => setIsContactOpen(true)}
         soundOn={soundOn}
         setSoundOn={setSoundOn}
       />
@@ -151,6 +154,12 @@ export default function App() {
       <StudioModal
         isOpen={isAboutOpen}
         onClose={() => setIsAboutOpen(false)}
+      />
+
+      {/* Contact Page Modal */}
+      <ContactModal
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
       />
     </div>
   );

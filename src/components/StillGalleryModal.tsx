@@ -211,9 +211,10 @@ export const StillGalleryModal: React.FC<StillGalleryModalProps> = ({
   return (
     <motion.div
       key={`gallery-screen-wrapper-${project.id}`}
-      initial={{ opacity: 1 }}
+      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35, ease: 'easeInOut' }}
       className="fixed inset-0 z-50 overflow-hidden pointer-events-auto"
     >
       {/* 1. BLUE SLIDE: Glides across and fully covers the entire screen first */}

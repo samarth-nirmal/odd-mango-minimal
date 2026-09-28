@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { Project } from '../types';
 import { playTick, playShutter } from '../services/audio';
 import { getImageRGB } from '../services/colorExtractor';
@@ -58,8 +59,12 @@ export const ProjectLightbox: React.FC<ProjectLightboxProps> = ({
   }, [currentFrameUrl, project.slug]);
 
   return (
-    <div
+    <motion.div
       id="project-lightbox-modal"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35, ease: 'easeInOut' }}
       className="fixed inset-0 z-50 flex flex-col justify-between select-none p-6 sm:p-10"
       onClick={onClose}
     >
@@ -165,6 +170,6 @@ export const ProjectLightbox: React.FC<ProjectLightboxProps> = ({
           CLICK IMAGE OR ARROWS TO ADVANCE
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
