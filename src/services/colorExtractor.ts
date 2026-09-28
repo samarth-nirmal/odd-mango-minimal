@@ -11,28 +11,12 @@ export const IMAGE_COLORS: Record<string, RGB> = imageColorsData as Record<strin
 
 // Curated project-level vibrant tones for instant zero-latency transitions
 export const PROJECT_COLOR_PRESETS: Record<string, RGB> = {
-  'vans-sandton-opening': { r: 164, g: 110, b: 64 }, // skate oak / warm amber
-  'totalsports-womens-race': { r: 218, g: 56, b: 112 }, // vibrant magenta / hot pink
-  'netflix-comic-con-cpt': { r: 48, g: 96, b: 175 }, // neon cyan / comic-con blue
-  'o-studioza': { r: 115, g: 100, b: 88 }, // concrete neutral / editorial
-  'new-balance-2002r': { r: 138, g: 132, b: 120 }, // technical mesh slate
-  'crocs-x-sportscene': { r: 210, g: 135, b: 45 }, // playful bright orange
-  'johnnie-walker-afro-exchange': { r: 182, g: 124, b: 52 }, // rich whisky gold
-  'kylablac': { r: 72, g: 112, b: 154 }, // rooftop sky & denim blue
-  'braam-fashion-week': { r: 168, g: 78, b: 58 }, // urban terracotta
-  'trinidad-james': { r: 162, g: 52, b: 68 }, // burgundy & gold
-  'maybelline-africa': { r: 198, g: 68, b: 98 }, // cosmetic berry / rose
-  'instax-in-alexandra': { r: 142, g: 102, b: 72 }, // sepia documentary warmth
-  'curtissy-li-king-billius': { r: 84, g: 76, b: 138 }, // royal indigo / violet
-  'puma-slipstream': { r: 38, g: 156, b: 138 }, // electric mint / teal
-  'red-bull-tetris': { r: 196, g: 42, b: 58 }, // arcade scarlet
-  'red-bull-kunye-records': { r: 172, g: 68, b: 92 }, // afro-house sunset
-  'glenfiddich-experience': { r: 44, g: 96, b: 64 }, // highland forest green
-  'slaps-reel': { r: 52, g: 82, b: 134 }, // cinematic midnight navy
-  'studio88-adidasza': { r: 56, g: 106, b: 164 }, // cobalt sportswear
-  'be-an-all-star': { r: 168, g: 54, b: 62 }, // vintage red
-  'nedbank-polo': { r: 54, g: 118, b: 76 }, // emerald turf & champagne
-};
+  'loop': { r: 60, g: 75, b: 110 },
+  'cine-sanskriti-tour': { r: 180, g: 110, b: 50 },
+  'ocean-muse': { r: 40, g: 110, b: 160 },
+  'ashiana-amodh': { r: 160, g: 130, b: 80 },
+  'restraunt-tour-reel': { r: 180, g: 80, b: 50 },
+  'loop-motion': { r: 60, g: 75, b: 110 },
 
 /**
  * Retrieves the dominant RGB of an image URL, checking exact matches first,

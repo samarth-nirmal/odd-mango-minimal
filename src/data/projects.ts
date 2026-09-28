@@ -1,4 +1,9 @@
 import { Project, StudioInfo } from '../types';
+import ashianaAmodhVideo from '../assets/Hero Videos/Ashiana Amodh.mp4';
+import cineSanskritiTourVideo from '../assets/Hero Videos/Cine Sanskriti Tour.mp4';
+import loopVideo from '../assets/Hero Videos/Loop.mp4';
+import oceanMuseVideo from '../assets/Hero Videos/Ocean Muse  (1).mp4';
+import restrauntTourReelVideo from '../assets/Hero Videos/Restraunt Tour Reel.mp4';
 
 export const STUDIO_INFO: StudioInfo = {
   title: 'ODD MANGO',
@@ -414,107 +419,107 @@ export const PROJECTS: Project[] = [
   },
 
   // MOTION (8 projects)
-  // 14. Puma Slipstream
+  // 14. Loop
   {
     id: '14',
-    slug: 'puma-slipstream',
-    name: 'Puma Slipstream',
-    client: 'Puma',
+    slug: 'loop-motion',
+    name: 'Loop',
+    client: 'Odd Mango Motion',
     type: 'motion',
     tag: 'campaign',
     count: 20,
     duration: 48,
     image: 'https://image.mux.com/V01CbaLfS33rSWoMYvgJSud4WkOMXDxFF5CmFyBOSjAM/thumbnail.webp?time=9&width=1200',
-    video: assetUrl('videos/sample.mp4'),
+    video: loopVideo,
     gallery: [
       'https://image.mux.com/V01CbaLfS33rSWoMYvgJSud4WkOMXDxFF5CmFyBOSjAM/thumbnail.webp?time=9&width=1200',
       assetUrl('images/carousel-3.webp')
     ],
-    alt: 'Puma Slipstream sneaker campaign showcasing urban dance and retro styling',
-    description: 'A nostalgic homage to 80s basketball heritage remixed for contemporary street style in Maboneng.',
+    alt: 'Loop cinematic video sequence exploring urban rhythm and movement',
+    description: 'A rhythmic visual study exploring movement, urban cadence, and light dynamics.',
     meta: {
       camera: 'ARRI Alexa Mini LF',
       lens: 'Cooke Anamorphic /i 40mm',
       aperture: 'T2.3',
       shutter: '1/48s',
       iso: '800',
-      year: '2023',
-      location: 'Maboneng Precinct'
+      year: '2024',
+      location: 'Production Studio'
     }
   },
-  // 15. Red bull x Tetris
+  // 15. Cine Sanskriti Tour
   {
     id: '15',
-    slug: 'red-bull-tetris',
-    name: 'Red bull x Tetris',
-    client: 'Red Bull',
+    slug: 'cine-sanskriti-tour',
+    name: 'Cine Sanskriti Tour',
+    client: 'Cine Sanskriti',
     type: 'motion',
     tag: 'events',
     count: 14,
     duration: 35,
     image: 'https://image.mux.com/7b32Z4f2N01Y45M7vP9k9XvN6g01wQ3m/thumbnail.webp?time=4&width=1200',
-    video: assetUrl('videos/sample.mp4'),
+    video: cineSanskritiTourVideo,
     gallery: [
       'https://image.mux.com/7b32Z4f2N01Y45M7vP9k9XvN6g01wQ3m/thumbnail.webp?time=4&width=1200',
       assetUrl('images/carousel-2.webp')
     ],
-    alt: 'High octane gaming tournament and arcade lights for Red Bull x Tetris',
-    description: 'Fast-paced editing capturing competitive esports tension, retro visuals and laser displays.',
+    alt: 'Cine Sanskriti Tour cinematic showcase capturing cultural essence and visual depth',
+    description: 'Cinematic journey through cultural landscapes, rich textures and vibrant live movement.',
     meta: {
       camera: 'Sony FX6',
       lens: 'Sony GM 24-70mm f/2.8',
       aperture: 'f/2.8',
       shutter: '1/50s',
       iso: '1600',
-      year: '2023',
-      location: 'Kyalami Theatre'
+      year: '2024',
+      location: 'Cultural Tour'
     }
   },
-  // 16. Red bull x KUNYE Records
+  // 16. Ocean Muse
   {
     id: '16',
-    slug: 'red-bull-kunye-records',
-    name: 'Red bull x KUNYE Records',
-    client: 'Red Bull',
+    slug: 'ocean-muse',
+    name: 'Ocean Muse',
+    client: 'Ocean Muse',
     type: 'motion',
-    tag: 'events',
+    tag: 'editorial',
     count: 16,
     duration: 62,
     image: 'https://image.mux.com/Kq2u3d4N6k9XvM7vP9k9XvN6g01wQ3m/thumbnail.webp?time=12&width=1200',
-    video: assetUrl('videos/sample.mp4'),
+    video: oceanMuseVideo,
     gallery: [
       'https://image.mux.com/Kq2u3d4N6k9XvM7vP9k9XvN6g01wQ3m/thumbnail.webp?time=12&width=1200'
     ],
-    alt: 'Afro-house music festival and crowd euphoria curated by Shimza and Kunye',
-    description: 'Deep resonant house rhythms and sonic vibration connecting thousands of dancers at sunset.',
+    alt: 'Ocean Muse ethereal motion study and serene aquatic color grading',
+    description: 'Deep resonant flow, ocean currents and poetic visual stillness.',
     meta: {
       camera: 'RED Komodo 6K',
       lens: 'Canon Cine-Servo 17-120mm',
       aperture: 'T2.95',
       shutter: '1/48s',
       iso: '800',
-      year: '2023',
-      location: 'Huddle Park, Linksfield'
+      year: '2024',
+      location: 'Coastal Reserve'
     }
   },
-  // 17. Glenfiddich Experience
+  // 17. Ashiana Amodh
   {
     id: '17',
-    slug: 'glenfiddich-experience',
-    name: 'Glenfiddich Experience',
-    client: 'Aston Martin',
+    slug: 'ashiana-amodh',
+    name: 'Ashiana Amodh',
+    client: 'Ashiana Amodh',
     type: 'motion',
-    tag: 'events',
+    tag: 'commercial',
     count: 12,
     duration: 71,
     image: 'https://image.mux.com/9IOm1pHI016vef02G5oK1EDn80100Qx7ZlKKh0159MKdhiz8/thumbnail.webp?time=8&width=1200',
-    video: assetUrl('videos/sample.mp4'),
+    video: ashianaAmodhVideo,
     gallery: [
       'https://image.mux.com/9IOm1pHI016vef02G5oK1EDn80100Qx7ZlKKh0159MKdhiz8/thumbnail.webp?time=8&width=1200',
       assetUrl('images/carousel-4.webp')
     ],
-    alt: 'Luxury scotch tasting paired with Aston Martin supercar dynamics',
-    description: 'Precision engineering meets heritage distilling in an evening of high-performance elegance.',
+    alt: 'Ashiana Amodh luxury architectural and design motion film',
+    description: 'Architectural serenity and luxurious spatial design captured through high-definition motion.',
     meta: {
       camera: 'RED V-Raptor 8K VV',
       lens: 'Leitz Hugo 50mm T1.5',
@@ -522,26 +527,26 @@ export const PROJECTS: Project[] = [
       shutter: '1/48s',
       iso: '800',
       year: '2024',
-      location: 'Kyalami Grand Prix Circuit'
+      location: 'Ashiana Amodh Estate'
     }
   },
-  // 18. Slaps Reel
+  // 18. Restraunt Tour Reel
   {
     id: '18',
-    slug: 'slaps-reel',
-    name: 'Slaps Reel',
-    client: 'Slaps Sando',
+    slug: 'restraunt-tour-reel',
+    name: 'Restraunt Tour Reel',
+    client: 'Hospitality & Dining',
     type: 'motion',
     tag: 'commercial',
     count: 9,
     duration: 18,
     image: 'https://image.mux.com/sZFHyiJqiCTe02PVrjeeDBXy8R4nMgHcDjxDRWDXEBtw/thumbnail.webp?time=19&width=1200',
-    video: assetUrl('videos/sample.mp4'),
+    video: restrauntTourReelVideo,
     gallery: [
       'https://image.mux.com/sZFHyiJqiCTe02PVrjeeDBXy8R4nMgHcDjxDRWDXEBtw/thumbnail.webp?time=19&width=1200'
     ],
-    alt: 'Fast-cut culinary motion sizzle reel for artisanal sandwich shop',
-    description: 'High-speed macro cinematography capturing sizzling textures and mouthwatering craft.',
+    alt: 'Fast-cut culinary motion sizzle reel and restaurant ambience tour',
+    description: 'Dynamic pacing, culinary artistry, and vibrant restaurant hospitality captured on film.',
     meta: {
       camera: 'Phantom Flex4K',
       lens: 'Laowa 24mm T14 2X PeriProbe',
@@ -549,7 +554,7 @@ export const PROJECTS: Project[] = [
       shutter: '1/2000s (1000fps)',
       iso: '1600',
       year: '2024',
-      location: 'Parkhurst'
+      location: 'Culinary District'
     }
   },
   // 19. @studio88_branded x @adidasza
@@ -563,7 +568,7 @@ export const PROJECTS: Project[] = [
     count: 10,
     duration: 40,
     image: 'https://cdn.sanity.io/images/ayo3ha0v/production/49ecbb734f24c2fc9fc56ec694a9aee894ae4a81-1440x1919.jpg?w=1600&fit=max&fm=webp&q=80',
-    video: assetUrl('videos/sample.mp4'),
+    video: cineSanskritiTourVideo,
     gallery: [
       'https://cdn.sanity.io/images/ayo3ha0v/production/49ecbb734f24c2fc9fc56ec694a9aee894ae4a81-1440x1919.jpg?w=1600&fit=max&fm=webp&q=80'
     ],
@@ -590,7 +595,7 @@ export const PROJECTS: Project[] = [
     count: 15,
     duration: 52,
     image: 'https://cdn.sanity.io/images/ayo3ha0v/production/f88e65524f09f382c8177a6803356d462dc9b4d2-1125x2000.jpg?w=1600&fit=max&fm=webp&q=80',
-    video: assetUrl('videos/sample.mp4'),
+    video: loopVideo,
     gallery: [
       'https://cdn.sanity.io/images/ayo3ha0v/production/f88e65524f09f382c8177a6803356d462dc9b4d2-1125x2000.jpg?w=1600&fit=max&fm=webp&q=80'
     ],
@@ -617,7 +622,7 @@ export const PROJECTS: Project[] = [
     count: 8,
     duration: 45,
     image: 'https://cdn.sanity.io/images/ayo3ha0v/production/2ca7959c9ac480711c8451d92598c7205bb63a96-1080x1350.jpg?w=1600&fit=max&fm=webp&q=80',
-    video: assetUrl('videos/sample.mp4'),
+    video: ashianaAmodhVideo,
     gallery: [
       'https://cdn.sanity.io/images/ayo3ha0v/production/2ca7959c9ac480711c8451d92598c7205bb63a96-1080x1350.jpg?w=1600&fit=max&fm=webp&q=80'
     ],

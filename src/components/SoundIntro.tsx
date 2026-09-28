@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { loadSoundAssets, playShutter, setSoundEnabled } from '../services/audio';
+import loadingVideo from '../assets/Loading Video/loading video.mp4';
 
 interface SoundIntroProps {
   onEnter: (sound: boolean) => void;
@@ -8,6 +9,13 @@ interface SoundIntroProps {
 export const SoundIntro: React.FC<SoundIntroProps> = ({ onEnter }) => {
   const [isDismissing, setIsDismissing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -40,15 +48,30 @@ export const SoundIntro: React.FC<SoundIntroProps> = ({ onEnter }) => {
   return (
     <div
       id="sound-intro-modal"
-      className={`fixed inset-0 z-50 flex flex-col justify-between bg-[#111111] text-[#fcf8ef] p-6 sm:p-12 transition-opacity duration-500 select-none ${
+      className={`fixed inset-0 z-50 flex flex-col justify-between bg-[#111111] text-[#fcf8ef] p-6 sm:p-12 transition-opacity duration-500 select-none overflow-hidden ${
         isDismissing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
+      {/* Background Video */}
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        src={loadingVideo}
+      />
+
+      {/* Dark Blur & Black Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-none" />
+
       {/* Top Space */}
-      <div />
+      <div className="relative z-10" />
 
       {/* Center Intro Block */}
-      <div className="max-w-lg mx-auto text-center flex flex-col items-center">
+      <div className="relative z-10 max-w-lg mx-auto text-center flex flex-col items-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#fcf8ef] mb-3 flex items-baseline justify-center">
           <span>ODD MANGO</span>
           <sup className="text-sm ml-0.5">®</sup>
@@ -89,7 +112,7 @@ export const SoundIntro: React.FC<SoundIntroProps> = ({ onEnter }) => {
       </div>
 
       {/* Bottom Loading Strip & Percentage */}
-      <div className="w-full flex flex-col items-center gap-2">
+      <div className="relative z-10 w-full flex flex-col items-center gap-2">
         <span className="text-[11px] font-mono text-neutral-500">
           {String(progress).padStart(2, '0')}%
         </span>
