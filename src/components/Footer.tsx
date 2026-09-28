@@ -99,9 +99,9 @@ export const Footer: React.FC<FooterProps> = ({
           </button>
         </div>
 
-        {/* Center: Project Name + Meta */}
+        {/* Center: Project Name + Meta (Desktop only, mobile has title on the card itself) */}
         {currentProject && (
-          <div className="pointer-events-auto flex flex-col items-center absolute left-1/2 -translate-x-1/2 bottom-5 sm:bottom-6 text-center max-w-[50vw]">
+          <div className="hidden md:flex pointer-events-auto flex-col items-center absolute left-1/2 -translate-x-1/2 bottom-5 sm:bottom-6 text-center max-w-[50vw]">
             {/* Project Name */}
             <h2 className="text-base sm:text-lg font-extrabold uppercase tracking-wide text-[#f6f4ee] leading-tight truncate max-w-full">
               {currentProject.name}

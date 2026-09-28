@@ -845,6 +845,28 @@ export const SliderView: React.FC<SliderViewProps> = ({
                   isDragging={isDragging}
                 />
 
+                {/* Mobile Overlapped Project Name & Info (hidden on desktop, shifted cleanly up from bottom) */}
+                <div className="md:hidden absolute bottom-0 inset-x-0 z-30 pointer-events-none pb-[max(4.75rem,calc(env(safe-area-inset-bottom)+3.75rem))] pt-36 px-6 bg-gradient-to-t from-black/95 via-black/55 to-transparent flex flex-col items-start justify-end">
+                  <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#fcf8ef] leading-tight drop-shadow-md">
+                    {project.name}
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    {project.client && (
+                      <span className="text-xs text-[#c7c4bd] font-mono tracking-wide uppercase">
+                        {project.client}
+                      </span>
+                    )}
+                    {project.client && project.tag && (
+                      <span className="text-xs text-[#737373] font-mono">•</span>
+                    )}
+                    {project.tag && (
+                      <span className="text-xs text-[#c7c4bd] font-mono tracking-wide uppercase">
+                        {project.tag}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
                 {/* 3D Mode Framing Border Overlay - smoothly fades out to zero in off mode so it never affects content sizing */}
                 <div
                   className="absolute inset-0 pointer-events-none transition-opacity duration-900 ease-out"
