@@ -99,20 +99,24 @@ export const SliderView: React.FC<SliderViewProps> = ({
   const [isHoveringStage, setIsHoveringStage] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [windowSize, setWindowSize] = useState(() => ({
-    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
-    height: typeof window !== 'undefined' ? window.innerHeight : 800,
+    width: typeof window !== 'undefined' ? (window.visualViewport?.width || window.innerWidth) : 1200,
+    height: typeof window !== 'undefined' ? (window.visualViewport?.height || window.innerHeight) : 800,
   }));
   const isMobile = windowSize.width < 768;
   const effectiveCurveMode: CurveMode = isMobile ? 'off' : curveMode;
   const effectiveFisheye = isMobile ? false : fisheyeOn;
 
   const [frameDimensions, setFrameDimensions] = useState(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      return {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        fisheyeSize: Math.min(window.innerWidth, window.innerHeight),
-      };
+    if (typeof window !== 'undefined') {
+      const w = window.visualViewport?.width || window.innerWidth;
+      const h = window.visualViewport?.height || window.innerHeight;
+      if (w < 768) {
+        return {
+          width: w,
+          height: h,
+          fisheyeSize: Math.min(w, h),
+        };
+      }
     }
     return { width: 395, height: 573, fisheyeSize: 840 };
   });
@@ -205,15 +209,40 @@ export const SliderView: React.FC<SliderViewProps> = ({
   // Continuous physics animation loop for liquid 60/120fps smooth momentum
   useEffect(() => {
     let animId: number;
+    let lastTickTime = performance.now();
+    let scrollVelocity = 0;
 
     const tick = () => {
+      const now = performance.now();
+      const dt = Math.min(0.04, Math.max(0.001, (now - lastTickTime) / 1000));
+      lastTickTime = now;
+
       const delta = targetScrollRef.current - smoothScrollRef.current;
-      const isMoving = Math.abs(delta) > 0.0001 || isDraggingRef.current;
+      const isMoving = Math.abs(delta) > 0.0001 || Math.abs(scrollVelocity) > 0.0001 || isDraggingRef.current;
 
       if (isMoving && displayTotal > 0) {
-        // Luxurious, slower, cushioned damping (0.12 when dragging, 0.042 when free-floating for silky slow glide)
-        const factor = isDraggingRef.current ? 0.12 : 0.042;
-        smoothScrollRef.current += delta * factor;
+        if (isDraggingRef.current) {
+          // Responsive tracking while dragging
+          smoothScrollRef.current += delta * 0.14;
+          scrollVelocity = 0;
+        } else {
+          // Second-order critically damped smooth spring:
+          // Tuned for a moderately brisk, silky glide ("bit faster, but not too fast")
+          const STIFFNESS = 32; // Responsive, brisk pull
+          const DAMPING = 11.2; // Perfectly critically damped for a smooth, cushioned settle
+          const springForce = delta * STIFFNESS;
+          const dampingForce = scrollVelocity * DAMPING;
+          const acceleration = springForce - dampingForce;
+
+          scrollVelocity += acceleration * dt;
+          smoothScrollRef.current += scrollVelocity * dt;
+
+          // Snap to rest when settled
+          if (Math.abs(delta) < 0.0002 && Math.abs(scrollVelocity) < 0.001) {
+            smoothScrollRef.current = targetScrollRef.current;
+            scrollVelocity = 0;
+          }
+        }
 
         // Wrap smooth bounds seamlessly
         if (smoothScrollRef.current >= displayTotal) {
@@ -275,15 +304,25 @@ export const SliderView: React.FC<SliderViewProps> = ({
   // Responsive frame size: full-screen on mobile, tall portrait frames on desktop
   useEffect(() => {
     const updateSize = () => {
-      const h = window.innerHeight;
-      const w = window.innerWidth;
-      setWindowSize({ width: w, height: h });
+      let w = typeof window !== 'undefined' ? (window.visualViewport?.width ?? window.innerWidth) : 1200;
+      let h = typeof window !== 'undefined' ? (window.visualViewport?.height ?? window.innerHeight) : 800;
+
+      // Accurately measure the actual rendered layout space if containerRef is mounted
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          w = rect.width;
+          h = rect.height;
+        }
+      }
+
+      setWindowSize({ width: Math.round(w), height: Math.round(h) });
 
       if (w < 768) {
         setFrameDimensions({
-          width: w,
-          height: h,
-          fisheyeSize: Math.min(w, h),
+          width: Math.round(w),
+          height: Math.round(h),
+          fisheyeSize: Math.round(Math.min(w, h)),
         });
       } else {
         const availableH = h - 210;
@@ -305,8 +344,27 @@ export const SliderView: React.FC<SliderViewProps> = ({
     };
 
     updateSize();
+
     window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener('orientationchange', updateSize);
+    window.visualViewport?.addEventListener('resize', updateSize);
+    window.visualViewport?.addEventListener('scroll', updateSize);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      ro = new ResizeObserver(() => {
+        updateSize();
+      });
+      ro.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      window.removeEventListener('orientationchange', updateSize);
+      window.visualViewport?.removeEventListener('resize', updateSize);
+      window.visualViewport?.removeEventListener('scroll', updateSize);
+      ro?.disconnect();
+    };
   }, []);
 
   // 3D cylindrical radius scaled responsively to viewport width
@@ -351,36 +409,93 @@ export const SliderView: React.FC<SliderViewProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [goToNext, goToPrev, displayProjects, displayTotal, onSelectProject, isCurveTransitioning]);
 
-  // Non-blocking wheel listener with continuous smooth fractional movement
+  // Wheel scroll gesture: deliberate strong scroll advances or retreats a whole image
+  const wheelAccumulatorRef = useRef(0);
+  const isWheelLockedRef = useRef(false);
+  const wheelDecayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wheelUnlockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
+      if (displayTotal === 0) return;
+
       if (isCurveTransitioning) {
         setIsCurveTransitioning(false);
         if (curveTimerRef.current) clearTimeout(curveTimerRef.current);
       }
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      const curStep = effectiveFisheye ? 180 : step;
 
-      // Relaxed, cushioned continuous step: trackpad two-finger swipe produces silky slow glide
-      const scrollDelta = delta / (curStep * 2.4);
-      targetScrollRef.current += scrollDelta;
+      // Normalize delta based on deltaMode (0: pixels, 1: lines, 2: pages)
+      const rawDeltaX = e.deltaMode === 1 ? e.deltaX * 36 : e.deltaMode === 2 ? e.deltaX * 400 : e.deltaX;
+      const rawDeltaY = e.deltaMode === 1 ? e.deltaY * 36 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
 
-      // Extended settling delay so momentum can play out smoothly before magnetic center lock
-      if (snapTimeoutRef.current) clearTimeout(snapTimeoutRef.current);
-      snapTimeoutRef.current = setTimeout(() => {
-        if (!isDraggingRef.current) {
-          targetScrollRef.current = Math.round(targetScrollRef.current);
-        }
-      }, 350);
+      // Determine predominant scroll delta with direction
+      const dominantDelta = Math.abs(rawDeltaX) > Math.abs(rawDeltaY) ? rawDeltaX : rawDeltaY;
+
+      // If wheel gesture is currently locked after sliding an image, extend unlock timer until scrolling stops
+      if (isWheelLockedRef.current) {
+        if (wheelUnlockTimerRef.current) clearTimeout(wheelUnlockTimerRef.current);
+        wheelUnlockTimerRef.current = setTimeout(() => {
+          isWheelLockedRef.current = false;
+          wheelAccumulatorRef.current = 0;
+        }, 340);
+        return;
+      }
+
+      // Accumulate scroll input in the current stroke
+      // If direction reverses mid-stroke, reset accumulator towards the new direction
+      if (
+        (wheelAccumulatorRef.current > 0 && dominantDelta < 0) ||
+        (wheelAccumulatorRef.current < 0 && dominantDelta > 0)
+      ) {
+        wheelAccumulatorRef.current = dominantDelta;
+      } else {
+        wheelAccumulatorRef.current += dominantDelta;
+      }
+
+      // Reset accumulator if scrolling pauses or decays without reaching threshold
+      if (wheelDecayTimerRef.current) clearTimeout(wheelDecayTimerRef.current);
+      wheelDecayTimerRef.current = setTimeout(() => {
+        wheelAccumulatorRef.current = 0;
+      }, 180);
+
+      // Strong scroll threshold: normal/small scrolls (< 60px) are ignored,
+      // but a strong, deliberate scroll advances a whole image
+      const STRONG_SCROLL_THRESHOLD = 60;
+
+      if (Math.abs(wheelAccumulatorRef.current) >= STRONG_SCROLL_THRESHOLD) {
+        isWheelLockedRef.current = true;
+        const direction = wheelAccumulatorRef.current > 0 ? 1 : -1;
+        wheelAccumulatorRef.current = 0;
+
+        // Subtle micro-delay (70ms) before the slide launches
+        // Keeps the weighted inertia feel while being noticeably crisper and faster
+        if (scrollDelayTimerRef.current) clearTimeout(scrollDelayTimerRef.current);
+        scrollDelayTimerRef.current = setTimeout(() => {
+          targetScrollRef.current = Math.round(targetScrollRef.current) + direction;
+        }, 70);
+
+        // Keep locked during gesture momentum so a single strong swipe moves exactly one image
+        if (wheelUnlockTimerRef.current) clearTimeout(wheelUnlockTimerRef.current);
+        wheelUnlockTimerRef.current = setTimeout(() => {
+          isWheelLockedRef.current = false;
+          wheelAccumulatorRef.current = 0;
+        }, 420);
+      }
     };
 
     el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [step, effectiveFisheye, isCurveTransitioning]);
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      if (wheelDecayTimerRef.current) clearTimeout(wheelDecayTimerRef.current);
+      if (wheelUnlockTimerRef.current) clearTimeout(wheelUnlockTimerRef.current);
+      if (scrollDelayTimerRef.current) clearTimeout(scrollDelayTimerRef.current);
+    };
+  }, [displayTotal, isCurveTransitioning]);
 
   // Pointer drag handling: 1:1 direct tracking with momentum fling release
   const lastXRef = useRef(0);
@@ -729,28 +844,6 @@ export const SliderView: React.FC<SliderViewProps> = ({
                   fisheyeOn={effectiveFisheye}
                   isDragging={isDragging}
                 />
-
-                {/* Mobile Overlapped Project Name & Info (hidden on desktop) */}
-                <div className="md:hidden absolute bottom-0 inset-x-0 z-30 pointer-events-none pb-8 pt-32 px-6 bg-gradient-to-t from-black/95 via-black/55 to-transparent flex flex-col items-start justify-end">
-                  <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#fcf8ef] leading-tight drop-shadow-md">
-                    {project.name}
-                  </h2>
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    {project.client && (
-                      <span className="text-xs text-[#c7c4bd] font-mono tracking-wide uppercase">
-                        {project.client}
-                      </span>
-                    )}
-                    {project.client && project.tag && (
-                      <span className="text-xs text-[#737373] font-mono">•</span>
-                    )}
-                    {project.tag && (
-                      <span className="text-xs text-[#c7c4bd] font-mono tracking-wide uppercase">
-                        {project.tag}
-                      </span>
-                    )}
-                  </div>
-                </div>
 
                 {/* 3D Mode Framing Border Overlay - smoothly fades out to zero in off mode so it never affects content sizing */}
                 <div

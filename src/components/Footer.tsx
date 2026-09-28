@@ -38,7 +38,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   const cycleCurve = () => {
     playTick();
-    const modes: CurveMode[] = ['arch', 'arc', 'cylinder', 'off'];
+    const modes: CurveMode[] = ['arc', 'cylinder', 'arch', 'off'];
     const nextIdx = (modes.indexOf(curveMode) + 1) % modes.length;
     setCurveMode(modes[nextIdx]);
   };

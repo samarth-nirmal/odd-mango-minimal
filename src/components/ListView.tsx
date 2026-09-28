@@ -34,7 +34,7 @@ export const ListView: React.FC<ListViewProps> = ({
     <div
       id="list-stage"
       onMouseMove={handleMouseMove}
-      className="w-full h-[calc(100vh-200px)] mt-[105px] mb-[95px] overflow-y-auto px-6 sm:px-12 py-4 select-none"
+      className="w-full h-[calc(100dvh-200px)] mt-[105px] mb-[95px] overflow-y-auto px-6 sm:px-12 py-4 select-none"
     >
       <div className="max-w-5xl mx-auto">
         {/* Table header */}

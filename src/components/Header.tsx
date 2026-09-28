@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-40 px-6 sm:px-10 pt-6 pb-2 pointer-events-none flex items-start justify-between text-sm sm:text-base font-medium tracking-tight">
+      <header className="fixed top-0 inset-x-0 z-40 px-6 sm:px-10 pt-[max(1.5rem,calc(env(safe-area-inset-top)+0.5rem))] pb-2 pointer-events-none flex items-start justify-between text-sm sm:text-base font-medium tracking-tight">
         {/* Left: RS® Logo + Tagline */}
         <div className="flex items-start gap-4 sm:gap-6 pointer-events-auto">
           <button
@@ -155,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-50 bg-[#0c0d10]/98 backdrop-blur-2xl flex flex-col justify-between p-6 select-none md:hidden"
+            className="fixed inset-0 z-50 bg-[#0c0d10]/98 backdrop-blur-2xl flex flex-col justify-between p-6 pt-[max(1.5rem,calc(env(safe-area-inset-top)+0.5rem))] pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+0.5rem))] select-none md:hidden"
           >
             {/* Drawer Top: Logo + Close */}
             <div className="flex items-center justify-between pt-1">
@@ -207,12 +207,6 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Status & Options Card */}
               <div className="pt-6 border-t border-white/10 flex flex-col gap-4">
-                {/* Still Mode indicator */}
-                <div className="flex items-center justify-between font-mono text-xs uppercase tracking-wider text-[#c7c4bd]">
-                  <span>Viewing Mode</span>
-                  <span className="text-[#2554f2] font-semibold">STILL [OFF]</span>
-                </div>
-
                 {/* Sound Toggle */}
                 <div className="flex items-center justify-between font-mono text-xs uppercase tracking-wider text-[#c7c4bd]">
                   <span>Audio Feedback</span>

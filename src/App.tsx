@@ -20,7 +20,7 @@ export default function App() {
   const [soundOn, setSoundOn] = useState(true);
   const [gesturesOn, setGesturesOn] = useState(true);
   const [fisheyeOn, setFisheyeOn] = useState(false);
-  const [curveMode, setCurveMode] = useState<CurveMode>('cylinder');
+  const [curveMode, setCurveMode] = useState<CurveMode>('arc');
   const [viewMode, setViewMode] = useState<ViewMode>('slider');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -65,7 +65,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden text-[#f6f4ee] select-none flex flex-col justify-between selection:bg-[#2554f2] selection:text-white">
+    <div className="relative w-full h-[100dvh] max-h-[100dvh] overflow-hidden text-[#f6f4ee] select-none flex flex-col justify-between selection:bg-[#2554f2] selection:text-white">
       {/* Silky-smooth Dual-Layer Ambient Backdrop */}
       <AmbientBackdrop rgb={centerRGB} mode="dark" duration={900} />
 
@@ -127,6 +127,9 @@ export default function App() {
             key={`video-${selectedProject.id}`}
             project={selectedProject}
             onClose={() => setSelectedProject(null)}
+            soundOn={soundOn}
+            setSoundOn={setSoundOn}
+            totalProjectsCount={PROJECTS.length}
           />
         )}
 

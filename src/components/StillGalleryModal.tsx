@@ -37,8 +37,8 @@ export const StillGalleryModal: React.FC<StillGalleryModalProps> = ({
 
   useEffect(() => {
     const updateSize = () => {
-      const h = window.innerHeight;
-      const w = window.innerWidth;
+      const h = typeof window !== 'undefined' ? (window.visualViewport?.height ?? window.innerHeight) : 800;
+      const w = typeof window !== 'undefined' ? (window.visualViewport?.width ?? window.innerWidth) : 1200;
       const isMobile = w < 768;
 
       if (isMobile) {
@@ -63,7 +63,11 @@ export const StillGalleryModal: React.FC<StillGalleryModalProps> = ({
 
     updateSize();
     window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.visualViewport?.addEventListener('resize', updateSize);
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      window.visualViewport?.removeEventListener('resize', updateSize);
+    };
   }, []);
 
   // Card width matches main screen frame width
@@ -375,7 +379,7 @@ export const StillGalleryModal: React.FC<StillGalleryModalProps> = ({
               />
             </div>
 
-            {/* Bottom-Right: SOUND : [ON] & GESTURES : [OFF] */}
+            {/* Bottom-Right: SOUND : [ON/OFF] */}
             <div className="hidden md:flex items-center gap-6 sm:gap-8">
               <button
                 id="gallery-sound-toggle"
@@ -386,16 +390,6 @@ export const StillGalleryModal: React.FC<StillGalleryModalProps> = ({
                 className="hover:text-black transition-colors cursor-pointer uppercase"
               >
                 SOUND : [{soundOn ? 'ON' : 'OFF'}]
-              </button>
-              <button
-                id="gallery-gestures-toggle"
-                onClick={() => {
-                  playTick();
-                  setGesturesOn(!gesturesOn);
-                }}
-                className="hover:text-black transition-colors cursor-pointer uppercase"
-              >
-                GESTURES : [{gesturesOn ? 'ON' : 'OFF'}]
               </button>
             </div>
           </div>
